@@ -10,6 +10,12 @@ const board = [
 ]
 let player = 1;
 let turnCount = 0;
+let gameOver = false;
+
+function allDone(){
+    console.log('GAME OVER MAN');
+    gameOver = true;
+}
 
 function handleTurn(index){
     // Makes sure square isn't already played and div one row lower has been
@@ -24,38 +30,30 @@ function handleTurn(index){
     player === 1 ? player = 2 : player = 1;
     activePlayer.innerHTML = player;
     turnCount++;
+    if(turnCount === 42){
+        allDone();
+    }
 }
 
 function victoryConditions(latestSquare){
-    if (turnCount > 6){
-        if(latestSquare <= 20){
-            //Checks for vertical victory if it's at least four rows high
-            if( (squares[latestSquare].classList.value === squares[latestSquare + 7].classList.value) &&
-            (squares[latestSquare].classList.value === squares[latestSquare + 14].classList.value) &&
-            (squares[latestSquare].classList.value === squares[latestSquare + 21].classList.value)){
+    const cellPlayer = squares[latestSquare].classList.value;                       // The player identifier we'll compare to the row value
+    if(latestSquare <= 20){                                                         // Runs only if row is high enough for possibility of victory
+        if( 
+            (cellPlayer === squares[latestSquare + 7].classList.value) &&
+            (cellPlayer === squares[latestSquare + 14].classList.value) &&
+            (cellPlayer === squares[latestSquare + 21].classList.value)){
                 console.log('NAILED IT!')    
-            }
-        }    
-        const row = board[Math.floor(latestSquare / 7)];                                // Determines which row the clicked square is on and selects it from array
-        // Checks to see if center cell matches the three surrounding
-        if( (squares[row[3]].classList.value == squares[row[2]].classList.value) &&
-            (squares[row[3]].classList.value == squares[row[1]].classList.value) && 
-            (squares[row[3]].classList.value == squares[row[0]].classList.value)){
-                console.log('YAHOOOO')
-        }if(   (squares[row[3]].classList.value == squares[row[4]].classList.value) &&
-                    (squares[row[3]].classList.value == squares[row[5]].classList.value) && 
-                    (squares[row[3]].classList.value == squares[row[6]].classList.value)){
-                        console.log('YAHOOOO 2!')
-        }if(   (squares[row[3]].classList.value == squares[row[1]].classList.value) &&
-                    (squares[row[3]].classList.value == squares[row[2]].classList.value) && 
-                    (squares[row[3]].classList.value == squares[row[4]].classList.value)){
-                        console.log('YAHOOOO 2!')
-        }if(   (squares[row[3]].classList.value == squares[row[2]].classList.value) &&
-                    (squares[row[3]].classList.value == squares[row[4]].classList.value) && 
-                    (squares[row[3]].classList.value == squares[row[5]].classList.value)){
-                        console.log('YAHOOOO 2!')
         }
-    }
+    }    
+    const row = board[Math.floor(latestSquare / 7)];                                // Determines which row the clicked square is on and selects it from array
+    const rowData = row.map(cell => squares[cell].classList.value);                 // Extracts the player values for each cell in the row
+    let consecutive = 0;                                                            // Accumulator for number of consecutive cells
+    rowData.forEach(cell => {
+        (cell === cellPlayer) ? consecutive++ : consecutive = 0;
+        if(consecutive >= 4){
+            console.log(`${cellPlayer} is the winner!!!`);
+        }
+    });
 }
 
 squares.forEach((square, index) => square.addEventListener('click', () => handleTurn(index)));
